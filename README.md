@@ -31,6 +31,16 @@ $ sudo npm install web3
 $ cp node_modules/web3/dist/web3* .
 ```
 
+### 3. 실행 방법
+```
+$ node ksServer.js
+```
+로 웹 서버 실행 후,
+
+"[서버의 IP주소]:8080/main.html" 로 웹 페이지 접속
+
+<br/>
+
 기술 스택
 ------------------------
 <div>
@@ -45,24 +55,37 @@ $ cp node_modules/web3/dist/web3* .
   <img src="https://img.shields.io/badge/Web3.js-F16822?style=for-the-badge&logo=Web3.js&logoColor=white">
 </div>
 
+<br/>
 
 화면 구성
 ----------------------
+![화면 구성](https://github.com/godeka/KookminStore/assets/96081455/23dd96f0-f844-4481-9a63-90109b0c2402)
 
-
-
+<br/>
 
 주요 기능
 ----------------------
 #### 사용자
-1. 원하는 굿즈 선택해 구매 (Buy 버튼 클릭!)
+1. 원하는 굿즈 선택해 구매 (Buy 버튼 클릭!) 
+   - 선택한 상품에 맞는 금액(ether)이 사용자의 계정에서 계약 계정으로 송금
+
 2. 품절됐을 시, alert 창 띄움
 
 #### 컨트랙트 owner
 1. 모든 굿즈가 판매되었으면 컨트랙트 종료 (check soldout 버튼 클릭!)
+   - 계약에 모인 수익(ether)이 owner의 계정으로 송금
+
 2. 컨트랙트 소멸 (kill 버튼 클릭!)
 
+<br/>
 
 시연 영상
 ----------------------
-[https://youtu.be/fZzHUkN6jBk]
+https://youtu.be/fZzHUkN6jBk
+
+<br/>
+
+추가 구현할 내용
+-----------------------
+* 화면에 남은 수량 표시
+* 내가 구매한 굿즈 개수 확인 기능 (버튼)
