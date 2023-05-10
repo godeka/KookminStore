@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Kookmin Store</title>
+    <!--탭 이름-->
+    <link href="./main.css" rel="stylesheet" />
+
+    <script src="web3.min.js"></script>
+    <script type="text/javascript" src="ksabi.js"></script>
+    <script type="text/javascript">
+      var accounts = null;
+      var contractInstance = null;
+      var resultbox = null;
+
+      window.addEventListener("load", storeopen);
+
+      async function storeopen() {
+        if (window.ethereum) {
+          window.accounts = await ethereum.request({
+            method: "eth_requestAccounts",
+          });
+          window.web3 = new Web3(window.ethereum);
+        }
+        // Legacy dapp browsers...
+        else if (window.web3) {
+          window.web3 = new Web3(web3.currentProvider);
+        }
+        // Non-dapp browsers...
+        else {
+          console.log(
+            "Non-Ethereum browser detected. You should consider trying MetaMask!"
+          );
+          window.web3 = null;
+        }
+
+        registerEventHandlers();
+      }
+
+      async function registerEventHandlers() {
+        var address = "0x51b945e30e60d57152E29A0040ebFd8aBEEbc6d6";
+        contractInstance = await new window.web3.eth.Contract(ksabi, address);
+
+        // 굿즈 구매
+        let btn = document.getElementById("buyProduct1");
+        btn.addEventListener("click", buyProduct1Clicked);
+        btn = document.getElementById("buyProduct2");
+        btn.addEventListener("click", buyProduct2Clicked);
+        btn = document.getElementById("buyProduct3");
+        btn.addEventListener("click", buyProduct3Clicked);
+
+        // 에러 메세지 출력
+        resultbox = document.getElementById("resultbox");
+
+        // 모든 상품 품절 체크 (판매 종료)
+        btn = document.getElementById("checkSoldout");
+        btn.addEventListener("click", checkSoldout);
+
+        // 컨트랙트 소멸
+        btn = document.getElementById("kill");
+        btn.addEventListener("click", killfunc);
+      }
+
+      // 굿즈 구매
+      async function buyProduct1Clicked() {
+        // 상품 1
+        if (contractInstance != null) {
+          try {
+            let isEnded = await contractInstance.methods.isEnded().call();
+            if (isEnded) {
+              // 스토어 판매 종료
+              alert(
+                "재고 소진으로 인해 상품 판매가 종료되었습니다. \n그동안 Kookmin Store를 사랑해주셔서 감사합니다."
+              );
+              return;
+            }
+            let numStock = await contractInstance.methods.getNumStock(1).call();
+            if (numStock == 0) {
+              // 상품 1 재고 == 0
+              alert("죄송합니다. <상품 1>이 품절되었습니다.");
+              return;
+            }
+            let price = "3"; // 3eth
+            let value = await contractInstance.methods
+              .buy(1)
+              .send({
+                from: accounts[0],
+                value: web3.utils.toWei(price, "ether"),
+              });
+          } catch (e) {
+            resultbox.innerHTML = "Error Occured: " + e;
+            console.log(e); // 콘솔에 에러 메세지 출력
+          }
+        }
+      }
+      async function buyProduct2Clicked() {
+        // 상품 2
+        if (contractInstance != null) {
+          try {
+            let isEnded = await contractInstance.methods.isEnded().call();
+            if (isEnded) {
+              // 스토어 판매 종료
+              alert(
+                "재고 소진으로 인해 상품 판매가 종료되었습니다. \n그동안 Kookmin Store를 사랑해주셔서 감사합니다."
+              );
+              return;
+            }
+            let numStock = await contractInstance.methods.getNumStock(2).call();
+            if (numStock == 0) {
+              // 상품 2 재고 == 0
+              alert("죄송합니다. <상품 2>이 품절되었습니다.");
+              return;
+            }
+            let price = "5"; // 5eth
+            let value = await contractInstance.methods
+              .buy(2)
+              .send({
+                from: accounts[0],
+                value: web3.utils.toWei(price, "ether"),
+              });
+          } catch (e) {
+            resultbox.innerHTML = "Error Occured: " + e;
+            console.log(e); // 콘솔에 에러 메세지 출력
+          }
+        }
+      }
+      async function buyProduct3Clicked() {
+        // 상품 3
+        if (contractInstance != null) {
+          try {
+            let isEnded = await contractInstance.methods.isEnded().call();
+            if (isEnded) {
+              // 스토어 판매 종료
+              alert(
+                "재고 소진으로 인해 상품 판매가 종료되었습니다. \n그동안 Kookmin Store를 사랑해주셔서 감사합니다."
+              );
+              return;
+            }
+            let numStock = await contractInstance.methods.getNumStock(3).call();
+            if (numStock == 0) {
+              // 상품 3 재고 == 0
+              alert("죄송합니다. <상품 3>이 품절되었습니다.");
+              return;
+            }
+            let price = "10"; // 10eth
+            let value = await contractInstance.methods
+              .buy(3)
+              .send({
+                from: accounts[0],
+                value: web3.utils.toWei(price, "ether"),
+              });
+          } catch (e) {
+            resultbox.innerHTML = "Error Occured: " + e;
+            console.log(e); // 콘솔에 에러 메세지 출력
+          }
+        }
+      }
+
+      // 모든 상품 품절 체크 (판매 종료)
+      async function checkSoldout() {
+        if (contractInstance != null) {
+          try {
+            await contractInstance.methods
+              .checkSoldout()
+              .send({ from: accounts[0] });
+            alert("재고 소진으로 상품 판매 종료!!");
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      }
+
+      // 컨트랙트 소멸
+      async function killfunc() {
+        if (contractInstance != null) {
+          try {
+            let value = await contractInstance.methods
+              .kill()
+              .send({ from: accounts[0] });
+            resultbox.innerHTML = value;
+          } catch (e) {
+            resultbox.innerHTML = "Error occured" + e;
+            console.log(error);
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="title">
+      <div class="title_content">Kookmin Store</div>
+    </div>
+
+    <div class="content">
+      <!--상품1-->
+      <div class="product">
+        <div class="img_container">
+          <img class="product_img" src="img/img1.jpg" alt="product_img" />
+        </div>
+        <div class="product_cmt">
+          <p class="product_name">상품 1</p>
+          <p class="product_price">3 ETH</p>
+        </div>
+        <form class="btn_form">
+          <!--buy 버튼-->
+          <input type="button" id="buyProduct1" value="Buy" class="btn_buy" />
+        </form>
+      </div>
+
+      <!--상품2-->
+      <div class="product">
+        <div class="img_container">
+          <img class="product_img" src="img/img2.jpg" alt="product_img" />
+        </div>
+        <div class="product_cmt">
+          <p class="product_name">상품 2</p>
+          <p class="product_price">5 ETH</p>
+        </div>
+        <form class="btn_form">
+          <!--buy 버튼-->
+          <input type="button" id="buyProduct2" value="Buy" class="btn_buy" />
+        </form>
+      </div>
+
+      <!--상품3-->
+      <div class="product">
+        <div class="img_container">
+          <img class="product_img" src="img/img3.jpg" alt="product_img" />
+        </div>
+        <div class="product_cmt">
+          <p class="product_name">상품 3</p>
+          <p class="product_price">10 ETH</p>
+        </div>
+        <form class="btn_form">
+          <!--buy 버튼-->
+          <input type="button" id="buyProduct3" value="Buy" class="btn_buy" />
+        </form>
+      </div>
+    </div>
+
+    <div class="end">
+      <div class="container">
+        <div class="container_left">
+          <div class="right_end_content">
+            Result:
+            <div class="right_result_box" id="resultbox"></div>
+            <form class="end_btn_form">
+              <!--kill 버튼-->
+              <input
+                type="button"
+                id="kill"
+                value="kill button"
+                class="end_btn"
+              />
+            </form>
+            <form class="end_btn_form">
+              <!--checkSoldout 버튼-->
+              <input
+                type="button"
+                id="checkSoldout"
+                value="check soldout"
+                class="end_btn"
+              />
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <A href = "https://youtu.be/fZzHUkN6jBk">유튜브 링크 </A>
+  </body>
+</html>
